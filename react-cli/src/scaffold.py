@@ -246,7 +246,7 @@ def generate_folders(file_path:str):
         __create_folder_path('/'.join([file_path, f, f]))
 
 
-def generate_context(file_path:str, use_typescript:bool = False):
+def generate_context(file_path:str, use_typescript:bool = False, extension: str = None):
 
     __create_folder_path(file_path)        
     
@@ -276,7 +276,12 @@ def generate_context(file_path:str, use_typescript:bool = False):
     """
     path =f"{__get_path(file_path)}/{name}Provider"
 
-    __create_file(path,'ts' if use_typescript else 'js', template)
+    ext = 'ts' if use_typescript else 'js'
+
+    if not extension is None:
+        ext = extension
+
+    __create_file(path, ext, template)
 
 
 def generate_test(file_path:str, extension:str):

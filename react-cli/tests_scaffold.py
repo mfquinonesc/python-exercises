@@ -125,6 +125,8 @@ generate_context(file_path)
 
 generate_context(file_path, True)
 
+generate_context(file_path, extension='tsx')
+
 # Testing component test file 
 
 file_path = get_encapsulated_path('tests/app/Button')

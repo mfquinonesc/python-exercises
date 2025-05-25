@@ -92,8 +92,9 @@ def generate_component(file_path: str, extension: str, include_stylesheet: bool 
         );  
     }}
     """
+    path = f"{__get_path(file_path)}/{name}"
     
-    __create_file(file_path, extension, template)
+    __create_file(path, extension, template)
 
 
 def generate_page(file_path: str, extension: str, include_stylesheet: bool = False, use_module: bool = False, use_scss: bool = False):
@@ -152,13 +153,13 @@ def generate_router(file_path: str, extension: str):
     if not __check_folder_path(file_path):
         return
 
-    name = __get_file_name(file_path)
+    name =__uppercase_first(__get_file_name(file_path))
 
     template = f"""
     import React from 'react';
     import {{ BrowserRouter as Router, Routes, Route }} from 'react-router-dom';      
 
-    export default function AppRoutes() {{
+    export default function {name}() {{
         return (
             <Router>
                 <Routes>
@@ -168,7 +169,9 @@ def generate_router(file_path: str, extension: str):
         );
     }}
     """
-    __create_file(file_path, extension, template)
+    path = f"{__get_path(file_path)}/{name}"
+
+    __create_file(path, extension, template)
 
 
 def generate_store(file_path: str, extension: str):
@@ -195,7 +198,7 @@ def generate_stylesheet(file_path: str, use_module: bool = False, use_scss: bool
     if not __check_folder_path(file_path):
         return
 
-    component = __get_file_name(file_path)
+    component =__uppercase_first(__get_file_name(file_path))
 
     file_name = f"{component}{'.module' if use_module else ''}"
 
@@ -232,7 +235,7 @@ def generate_interface(file_path: str):
     if not __check_folder_path(file_path):
         return
 
-    name = __get_file_name(file_path)
+    name =__uppercase_first(__get_file_name(file_path))
 
     template = __create_template(name, 'interface')
     __create_file(file_path, 'ts', template)
@@ -243,7 +246,7 @@ def generate_class(file_path: str, use_typescript: bool = False):
     if not __check_folder_path(file_path):
         return
 
-    name = __get_file_name(file_path)
+    name =__uppercase_first(__get_file_name(file_path))
 
     template = __create_template(name, 'class')
     __create_file(file_path, 'ts' if use_typescript else 'js', template)
@@ -297,3 +300,33 @@ def generate_context(file_path:str, use_typescript:bool = False):
     path =f"{__get_path(file_path)}/{name}Provider"
 
     __create_file(path,'ts' if use_typescript else 'js', template)
+
+
+def generate_test(file_path:str, extension:str):
+
+    if not __check_folder_path(file_path):
+        return
+    
+    name = __uppercase_first(__get_file_name(file_path))
+
+    path = f"{__get_path(file_path)}/{name}.test"
+
+    __create_file(path, extension, '')
+
+
+def generate_barrel_file(file_path:str, use_typescript:bool = False):
+
+    if not __check_folder_path(file_path):
+        return    
+    
+    component =__uppercase_first(__get_file_name(file_path))
+
+    template =f"""
+    export {{ default }} from './{component}';
+    """
+
+    path = f"{__get_path(file_path)}/index"
+
+    extension = f".{'ts' if use_typescript else 'js'}"
+
+    __create_file(path, extension, template)

@@ -1,10 +1,25 @@
 from src.scaffold import *
+import shutil
+
+
+# Delete folders
+try:
+    shutil.rmtree('tests')       
+except Exception as e:
+    pass
+
+
+try:  
+    shutil.rmtree('node_modules')    
+except Exception as e:
+    pass
+
 
 # Testing scaffold
 
 # Testing components
 
-file_path = 'tests/components/Button'
+file_path = 'tests/components/button'
 
 generate_component(file_path, '.js', True, True, True)
 
@@ -14,7 +29,7 @@ generate_component(file_path, '.tsx')
 
 # Testing pages
 
-file_path = 'tests/pages/Home'
+file_path = 'tests/pages/home'
 
 generate_page(file_path, '.js', True, True, True)
 
@@ -24,7 +39,7 @@ generate_page(file_path, '.tsx')
 
 # Testing stores
 
-file_path = 'tests/stores/AppStore'
+file_path = 'tests/stores/appStore'
 
 generate_store(file_path, '.js')
 
@@ -34,7 +49,7 @@ generate_store(file_path, '.tsx')
 
 # Testing routes 
 
-file_path = 'tests/routers/AppRouter'
+file_path = 'tests/routers/appRouter'
 
 generate_router(file_path, '.js')
 
@@ -109,3 +124,23 @@ file_path = 'tests/context/login'
 generate_context(file_path)
 
 generate_context(file_path, True)
+
+# Testing component test file 
+
+file_path = get_encapsulated_path('tests/app/Button')
+
+generate_test(file_path,'jsx')
+
+file_path = get_encapsulated_path('tests/app/Selector')
+
+generate_test(file_path,'tsx')
+
+generate_test(file_path,'js')
+
+# Testing barrel file 
+
+file_path = get_encapsulated_path('tests/app/Selector')
+
+generate_barrel_file(file_path)
+
+generate_barrel_file(file_path, True)

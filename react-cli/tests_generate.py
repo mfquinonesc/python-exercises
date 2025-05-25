@@ -101,3 +101,11 @@ generate_folders(file_path)
 
 path = get_encapsulated_path('tests/react/components/modal')
 print('path = ', path)
+
+# Testing Context 
+
+file_path = 'tests/context/login'
+
+generate_context(file_path)
+
+generate_context(file_path, True)

@@ -43,11 +43,9 @@ def __create_file(file_path: str, extension: str, template: str):
 
 def __create_template(name:str, keyword:str):
 
-    template = f"""\
-    /**
-    * {name} {keyword.capitalize()}    
-    */
-    export default {keyword} {name} {{    
+    template = f"""
+    export default {keyword} {name} {{
+     
     }}
     """
     return template
@@ -75,7 +73,7 @@ def generate_component(file_path: str, extension: str, include_stylesheet: bool 
     if not __check_folder_path(file_path):
         return
 
-    name = __get_file_name(file_path)
+    name = __uppercase_first(__get_file_name(file_path))
 
     stylesheet_import = ''
 
@@ -86,13 +84,6 @@ def generate_component(file_path: str, extension: str, include_stylesheet: bool 
     import React from 'react';
     {stylesheet_import}
 
-    /**
-    * {name} Component
-    *
-    * @component
-    * @param {{children}} props - Component children.
-    * @returns {{JSX.Element}} The rendered {name} component.
-    */
     export default function {name}({{children}}) {{
         return (
             <div>
@@ -101,6 +92,7 @@ def generate_component(file_path: str, extension: str, include_stylesheet: bool 
         );  
     }}
     """
+    
     __create_file(file_path, extension, template)
 
 
@@ -109,7 +101,7 @@ def generate_page(file_path: str, extension: str, include_stylesheet: bool = Fal
     if not __check_folder_path(file_path):
         return
 
-    name = __get_file_name(file_path)
+    name = __uppercase_first(__get_file_name(file_path))
 
     stylesheet_import = ''
 
@@ -120,14 +112,8 @@ def generate_page(file_path: str, extension: str, include_stylesheet: bool = Fal
     import React from 'react';
     {stylesheet_import}
 
-    /**
-    * {name} Page Component
-    *
-    * @component
-    * @returns {{JSX.Element}} The rendered {name} page.
-    */
     export default function {name}() {{
-        return <h1>{name} Page</h1>;
+        return <h1>{name} page</h1>;
     }}
     """
     __create_file(file_path, extension, template)
@@ -145,23 +131,14 @@ def generate_service(file_path: str, use_typescript: bool = False, include_axios
     axios_template = f"""
     import axios from 'axios';
 
-    /**
-    * Base URL for the API.
-    * Update this to point to your backend.
-    * @constant {{string}}
-    */
-    const API_BASE_URL = 'https://localhost:3000/.../{str.lower(name)}';
+    const API_BASE_URL = '';
     """
 
     template = f"""
     { axios_template if include_axios else ''}
-    /**
-    * {full_name} Service
-    *
-    * @namespace {full_name}
-    */
-    const {full_name} = {{       
-    }};
+    const {full_name} = {{
+    
+    }}
 
     export default {full_name};
     """
@@ -179,14 +156,8 @@ def generate_router(file_path: str, extension: str):
 
     template = f"""
     import React from 'react';
-    import {{BrowserRouter as Router, Routes, Route }} from 'react-router-dom';      
+    import {{ BrowserRouter as Router, Routes, Route }} from 'react-router-dom';      
 
-    /**
-    * {name} Component
-    *
-    * @component
-    * @returns {{JSX.Element}} The rendered route structure for the application.
-    */
     export default function AppRoutes() {{
         return (
             <Router>
@@ -209,16 +180,10 @@ def generate_store(file_path: str, extension: str):
 
     template = f"""
     import {{ configureStore }} from '@reduxjs/toolkit';
-    // import reducers here
-
-    /**
-    * Redux Store Configuration
-    *
-    * @module {name}
-    */
+   
     export const {name} = configureStore({{
         reducer: {{
-            // your reducers
+        
         }},
     }});
     """
@@ -230,9 +195,9 @@ def generate_stylesheet(file_path: str, use_module: bool = False, use_scss: bool
     if not __check_folder_path(file_path):
         return
 
-    component_name = __get_file_name(file_path)
+    component = __get_file_name(file_path)
 
-    file_name = f"{component_name}{'.module' if use_module else ''}"
+    file_name = f"{component}{'.module' if use_module else ''}"
 
     path = f"{__get_path(file_path)}/{file_name}"
 
@@ -251,10 +216,8 @@ def generate_hook(file_path: str, use_typescript: bool = False):
     full_name = f"use{name}"
     
     template = f"""  
-    /**
-    * {full_name}      
-    */    
-    function {full_name}() {{       
+    function {full_name}() {{
+    
     }}
 
     export default {full_name};
@@ -302,14 +265,35 @@ def generate_folders(file_path:str):
         __check_folder_path('/'.join([file_path, f, f]))
 
 
-def generate_context(file_path:str, extension:str):
+def generate_context(file_path:str, use_typescript:bool = False):
 
     if not __check_folder_path(file_path):
         return
     
-    name = __get_file_name(file_path)
+    name = __uppercase_first(__get_file_name(file_path))
 
     template = f"""
+    import {{ createContext, useContext }} from 'react';
 
+    const {name}Context = createContext();
+
+    export function {name}Provider({{ children }}) {{
+
+        return (
+            <{name}Context.Provider>
+                {{ children }}
+            </{name}Context.Provider>
+        );
+    }}
+
+    export function use{name}Context() {{
+        const context = useContext({name}Context);
+        if (!context) {{
+            throw new Error("use{name}Context must be used within a {name}Provider");
+        }}
+        return context;
+    }}
     """
-    __create_file(file_path, extension, template)
+    path =f"{__get_path(file_path)}/{name}Provider"
+
+    __create_file(path,'ts' if use_typescript else 'js', template)

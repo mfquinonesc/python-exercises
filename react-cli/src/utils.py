@@ -1,30 +1,24 @@
-import os 
-import json
+import re 
 
-def is_react_project(base_path = "."):
+def to_kebab_case(text:str):
+    text = re.sub(r'[\s_]+', '-', text)
+    text = re.sub(r'([a-z])([A-Z])', r'\1-\2', text)
+    return text.lower()
 
-    package_json_path = os.path.join(base_path, 'package.json')
 
-    if not os.path.exists(package_json_path):
-        return False
+# This function formats the file path, depending on whether it is 
+# a component or not, formats the last folder name
+def format_path(file_path:str, is_component = False):
     
-    try: 
-        with open(package_json_path, 'r') as f:
-            package_data = json.load(f)
-            dependencies = package_data.get("dependencies", {})
-            dev_dependencies = package_data.get("devDependencies", {})
-            return 'react' in dependencies or 'react' in dev_dependencies
-    
-    except Exception as e:
-        print(f"Error reading package.json: {e}")
-        return False
-    
-    
-def detect_typescript(base_path="."):
-    if os.path.exists(os.path.join(base_path, "tsconfig.json")):
-        return True
-    for root, _, files in os.walk(os.path.join(base_path, "src")):
-        for file in files:
-            if file.endswith(".ts") or file.endswith(".tsx"):
-                return True
-    return False
+    folders = file_path.split('/')     
+
+    formatted_folders = []
+    for folder in folders:
+        formatted_folders.append(to_kebab_case(folder))
+
+    if is_component:
+        component_name = folders.pop()
+        formatted_folders.pop()
+        formatted_folders.append(component_name)      
+
+    return '/'.join(formatted_folders)

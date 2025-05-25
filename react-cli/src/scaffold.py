@@ -1,36 +1,20 @@
 import textwrap
-import re
 import os
 
 ##
 # private functions
 ##
 
-def __check_folder_path(file_path: str):
-
-    pattern = r'^[a-zA-Z0-9/_]+$'
-
-    if not bool(re.match(pattern, file_path)):
-        print('Error -> the file path contains invalid characters')
-        return False
-
-    if file_path.startswith('/'):
-        print('Error -> the file path starts with /')
-        return False
-
-    if  file_path.endswith('/'):
-        print('Error -> the file path ends with /')
-        return False
-
+def __create_folder_path(file_path: str):
+  
     folders = file_path.split('/')
     folders.pop()
 
     if not len(folders) > 0:
-        return True
+        return 
 
     folder_path = "/".join(folders)
-    os.makedirs(folder_path, exist_ok=True)
-    return True
+    os.makedirs(folder_path, exist_ok=True)   
 
 
 def __create_file(file_path: str, extension: str, template: str):
@@ -70,8 +54,7 @@ def __uppercase_first(text:str):
 
 def generate_component(file_path: str, extension: str, include_stylesheet: bool = False, use_module: bool = False, use_scss: bool = False):
 
-    if not __check_folder_path(file_path):
-        return
+    __create_folder_path(file_path)    
 
     name = __uppercase_first(__get_file_name(file_path))
 
@@ -99,8 +82,7 @@ def generate_component(file_path: str, extension: str, include_stylesheet: bool 
 
 def generate_page(file_path: str, extension: str, include_stylesheet: bool = False, use_module: bool = False, use_scss: bool = False):
 
-    if not __check_folder_path(file_path):
-        return
+    __create_folder_path(file_path)    
 
     name = __uppercase_first(__get_file_name(file_path))
 
@@ -117,13 +99,15 @@ def generate_page(file_path: str, extension: str, include_stylesheet: bool = Fal
         return <h1>{name} page</h1>;
     }}
     """
-    __create_file(file_path, extension, template)
+
+    path = f"{__get_path(file_path)}/{name}"
+
+    __create_file(path, extension, template)
 
 
 def generate_service(file_path: str, use_typescript: bool = False, include_axios: bool = False):
 
-    if not __check_folder_path(file_path):
-        return
+    __create_folder_path(file_path)        
 
     name = __get_file_name(file_path)
 
@@ -150,8 +134,7 @@ def generate_service(file_path: str, use_typescript: bool = False, include_axios
 
 def generate_router(file_path: str, extension: str):
 
-    if not __check_folder_path(file_path):
-        return
+    __create_folder_path(file_path)  
 
     name =__uppercase_first(__get_file_name(file_path))
 
@@ -176,8 +159,7 @@ def generate_router(file_path: str, extension: str):
 
 def generate_store(file_path: str, extension: str):
 
-    if not __check_folder_path(file_path):
-        return
+    __create_folder_path(file_path)      
 
     name = __get_file_name(file_path)
 
@@ -195,8 +177,7 @@ def generate_store(file_path: str, extension: str):
 
 def generate_stylesheet(file_path: str, use_module: bool = False, use_scss: bool = False):
 
-    if not __check_folder_path(file_path):
-        return
+    __create_folder_path(file_path)      
 
     component =__uppercase_first(__get_file_name(file_path))
 
@@ -211,8 +192,7 @@ def generate_stylesheet(file_path: str, use_module: bool = False, use_scss: bool
 
 def generate_hook(file_path: str, use_typescript: bool = False):
 
-    if not __check_folder_path(file_path):
-        return
+    __create_folder_path(file_path)
 
     name = __uppercase_first(__get_file_name(file_path))
 
@@ -232,8 +212,7 @@ def generate_hook(file_path: str, use_typescript: bool = False):
 
 def generate_interface(file_path: str):
 
-    if not __check_folder_path(file_path):
-        return
+    __create_folder_path(file_path)     
 
     name =__uppercase_first(__get_file_name(file_path))
 
@@ -243,8 +222,7 @@ def generate_interface(file_path: str):
 
 def generate_class(file_path: str, use_typescript: bool = False):
 
-    if not __check_folder_path(file_path):
-        return
+    __create_folder_path(file_path)   
 
     name =__uppercase_first(__get_file_name(file_path))
 
@@ -265,13 +243,12 @@ def generate_folders(file_path:str):
                "services", "store", "hooks", "context", "utils", "types"]    
     
     for f in folders:
-        __check_folder_path('/'.join([file_path, f, f]))
+        __create_folder_path('/'.join([file_path, f, f]))
 
 
 def generate_context(file_path:str, use_typescript:bool = False):
 
-    if not __check_folder_path(file_path):
-        return
+    __create_folder_path(file_path)        
     
     name = __uppercase_first(__get_file_name(file_path))
 
@@ -304,8 +281,7 @@ def generate_context(file_path:str, use_typescript:bool = False):
 
 def generate_test(file_path:str, extension:str):
 
-    if not __check_folder_path(file_path):
-        return
+    __create_folder_path(file_path)       
     
     name = __uppercase_first(__get_file_name(file_path))
 
@@ -316,8 +292,7 @@ def generate_test(file_path:str, extension:str):
 
 def generate_barrel_file(file_path:str, use_typescript:bool = False):
 
-    if not __check_folder_path(file_path):
-        return    
+    __create_folder_path(file_path)       
     
     component =__uppercase_first(__get_file_name(file_path))
 

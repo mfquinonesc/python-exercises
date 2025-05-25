@@ -234,8 +234,13 @@ def get_encapsulated_path(file_path:str):
     
     path = __get_path(file_path)
     name = __get_file_name(file_path)
-    return '/'.join([path, name, name])
 
+    encap_path = '/'.join([path, name, name])
+    
+    if encap_path.startswith('/'):
+        encap_path = encap_path[1:]
+        
+    return encap_path
 
 def generate_folders(file_path:str):
 

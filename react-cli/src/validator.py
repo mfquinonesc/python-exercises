@@ -66,3 +66,45 @@ def check_file_path(file_path:str):
         return False    
    
     return True
+
+
+def get_component_extension(base_path:str = '.'):
+
+    use_typescript = False
+    with_sx = False
+
+    for root, _, files in os.walk(os.path.join(base_path,'src')):
+        for file in files:
+            if file.endswith('ts') or file.endswith('tsx'):
+                use_typescript = True
+            if file.endswith('jsx') or file.endswith('tsx'):
+                with_sx = True
+    
+    if use_typescript and with_sx:
+        return 'tsx'
+    if use_typescript and not with_sx:
+        return 'ts'
+    if with_sx:
+        return 'jsx'
+    
+    return 'js'
+ 
+
+def get_styles_extension(base_path:str = '.'):    
+
+    for root, _, files in os.walk(os.path.join(base_path,'src')):
+        for file in files:
+            if file.endswith('scss'):
+                return 'scss'
+            
+    return 'css'
+
+
+def use_style_module(base_path:str = '.'):
+
+    for root, _, files in os.walk(os.path.join(base_path,'src')):
+        for file in files:
+            if file.endswith('module.scss') or file.endswith('module.css'):
+                return True 
+            
+    return False               

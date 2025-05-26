@@ -23,9 +23,7 @@ def g(type: str, name: str, style: str, style_ext: str, react_ext: str, barrel: 
         return
 
     __generate_template(type,name, style, style_ext, react_ext, barrel, test)
-
-    click.secho(f"{','.join([type, name, style, style_ext, react_ext, str(barrel), str(test)])}", fg='green')
-
+  
 
 @click.command()
 @click.argument('type')
@@ -37,13 +35,11 @@ def generate():
 def __is_valid_environment():
 
     if not vl.check_required_files(['package.json']):
-        click.secho(
-            'Error: This command must be run inside a React project folder.', fg='red')
+        click.secho('Error: This command must be run inside a React project folder.', fg='red')
         return False
 
     if not vl.is_react_project():
-        click.secho(
-            'Error: No React project was found in the current directory.', fg='red')
+        click.secho('Error: No React project was found in the current directory.', fg='red')
         return False
 
     return True
@@ -59,8 +55,7 @@ def __are_valid_parameters(type: str, name: str, style: str, style_ext: str, rea
         return False
 
     if not vl.check_file_path(name):
-        click.secho(
-            f"Error: The name or path you entered is invalid.", fg='red')
+        click.secho(f"Error: The name or path you entered is invalid.", fg='red')
         click.secho(f"Invalid argument: {name}")
         return False
 
@@ -74,15 +69,13 @@ def __are_valid_parameters(type: str, name: str, style: str, style_ext: str, rea
     style_exts = ["auto", "css", "scss"]
 
     if not style_ext in style_exts:
-        click.secho(
-            f"Error: Invalid value for --style-ext: '{style_ext}'", fg='red')
+        click.secho(f"Error: Invalid value for --style-ext: '{style_ext}'", fg='red')
         click.secho(f"Allowed values are: {', '.join(style_exts)}.", fg='red')
 
     react_exts = ["auto", "js", "jsx", "ts", "tsx"]
 
     if not react_ext in react_exts:
-        click.secho(
-            f"Error: Invalid value for --react-ext: '{react_ext}'", fg='red')
+        click.secho(f"Error: Invalid value for --react-ext: '{react_ext}'", fg='red')
         click.secho(f"Allowed values are: {', '.join(react_exts)}.", fg='red')
 
     return True
@@ -94,8 +87,8 @@ def __create_component(name: str, react_ext: str, style_mode: str, style_ext: st
     component = folders.pop()
     folders.append(sc.__uppercase_first(component))
     path = '/'.join(folders)
-    path = ut.format_path(path, True)
-    path = sc.get_encapsulated_path(path)
+    dir_path = ut.format_path(path, True)
+    path = sc.get_encapsulated_path(dir_path)
 
     extension = vl.get_component_extension() if react_ext == 'auto' else react_ext
     include_stylesheet = style_mode != 'none' and style_mode != '-n'
@@ -103,16 +96,20 @@ def __create_component(name: str, react_ext: str, style_mode: str, style_ext: st
     use_scss = vl.get_styles_extension() == 'scss' if style_ext == 'auto' else style_ext == 'scss'
 
     sc.generate_component(path, extension, include_stylesheet, use_module, use_scss)
-    
+    click.secho(f"Created: {path}.{extension}", fg='green')
+       
     if include_stylesheet:
         sc.generate_stylesheet(path, use_module, use_scss)
+        click.secho(f"Created: {path}.{'module.'if use_module else ''}{ 'scss' if use_scss else 'css'}", fg='green')
     
     if test:
         sc.generate_test(path, extension)
+        click.secho(f"Created: {path}.test.{extension}", fg='green')
 
     if barrel:
         use_typescript = extension in ['tsx', 'ts']
-        sc.generate_barrel_file(path, use_typescript)        
+        sc.generate_barrel_file(path, use_typescript)
+        click.secho(f"Created: {dir_path}/index.{'ts' if use_typescript else 'js'}", fg='green')     
 
 
 def __generate_template(type: str, name: str, style_mode: str, style_ext: str, react_ext: str, barrel: bool, test: bool):

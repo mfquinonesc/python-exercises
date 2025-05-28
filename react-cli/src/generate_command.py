@@ -4,34 +4,6 @@ import scaffold as sc
 import utils as ut
 
 
-@click.command()
-@click.argument('type')
-@click.argument('name')
-@click.option('--style', default='auto', help='')
-@click.option('--style-ext', default='auto', help='')
-@click.option('--react-ext', default='auto', help='')
-@click.option('--barrel', '-b', is_flag=True, help='')
-@click.option('--test', '-t', is_flag=True, help='')
-def g(type: str, name: str, style: str, style_ext: str, react_ext: str, barrel: bool, test: bool):
-
-    print(barrel, test)
-
-    if not __is_valid_environment():
-        return
-
-    if not __are_valid_parameters(type, name, style, style_ext, react_ext):
-        return
-
-    __generate_template(type,name, style, style_ext, react_ext, barrel, test)
-  
-
-@click.command()
-@click.argument('type')
-@click.argument('name')
-def generate():
-    pass
-
-
 def __is_valid_environment():
 
     if not vl.check_required_files(['package.json']):
@@ -48,7 +20,7 @@ def __is_valid_environment():
 def __are_valid_parameters(type: str, name: str, style: str, style_ext: str, react_ext: str):
 
     types = ["component", "page", "router", "service", "store",
-             "hook", "context", "class", "interface", "c", "s"]
+             "hook", "context", "class", "interface", "c", "p", "s"]
 
     if not type in types:
         click.secho(f"Error: '{type}' is not a valid argument.", fg='red')
@@ -81,7 +53,7 @@ def __are_valid_parameters(type: str, name: str, style: str, style_ext: str, rea
     return True
 
 
-def __create_component(name: str, react_ext: str, style_mode: str, style_ext: str, barrel: bool, test: bool):
+def __create_component(name: str, react_ext: str, style_mode: str, style_ext: str, barrel: bool, test: bool, is_page:bool = False):
 
     folders = name.split('/')
     component = folders.pop()
@@ -92,10 +64,13 @@ def __create_component(name: str, react_ext: str, style_mode: str, style_ext: st
 
     extension = vl.get_component_extension() if react_ext == 'auto' else react_ext
     include_stylesheet = style_mode != 'none' and style_mode != '-n'
+    # detect the module in the style files
     use_module = style_mode == 'module' or style_mode == '-m'
     use_scss = vl.get_styles_extension() == 'scss' if style_ext == 'auto' else style_ext == 'scss'
 
-    sc.generate_component(path, extension, include_stylesheet, use_module, use_scss)
+    generator = sc.generate_page if is_page else sc.generate_component
+    generator(path, extension, include_stylesheet, use_module, use_scss)   
+    
     click.secho(f"Created: {path}.{extension}", fg='green')
        
     if include_stylesheet:
@@ -109,26 +84,60 @@ def __create_component(name: str, react_ext: str, style_mode: str, style_ext: st
     if barrel:
         use_typescript = extension in ['tsx', 'ts']
         sc.generate_barrel_file(path, use_typescript)
-        click.secho(f"Created: {dir_path}/index.{'ts' if use_typescript else 'js'}", fg='green')     
+        click.secho(f"Created: {dir_path}/index.{'ts' if use_typescript else 'js'}", fg='green')
+
+
+def __create_service():   
+    pass 
 
 
 def __generate_template(type: str, name: str, style_mode: str, style_ext: str, react_ext: str, barrel: bool, test: bool):
 
-    # here has to be the typescript validation and asignament
-    use_typescript = vl.detect_typescript()
-    print('Is a typescript project ', use_typescript)
-    # end
-
     if type == "component" or type == "c":
         __create_component(name, react_ext, style_mode, style_ext, barrel, test)
 
-    if type == "service" or type == "s":
-        pass
+    if type == "page" or type == "p":
+       __create_component(name, react_ext, style_mode, style_ext, barrel, test, True)
 
-    if type == "page":
-        pass
+    if type == "service" or type == "s":
+        pass    
 
     if type == "interface":
         pass
 
-    click.secho('DONE', fg='green')
+
+def __common_generate_options(func):
+    func = click.argument('name')(func)
+    func = click.argument('type')(func)
+    func = click.option('--style', default='auto', help='')(func)
+    func = click.option('--style-ext', default='auto', help='')(func)
+    func = click.option('--react-ext', default='auto', help='')(func)
+    func = click.option('--barrel', '-b', is_flag=True, help='')(func)
+    func = click.option('--test', '-t', is_flag=True, help='')(func)
+    return func
+
+
+def genarate_handler(type: str, name: str, style: str, style_ext: str, react_ext: str, barrel: bool, test: bool):
+
+    if not __is_valid_environment():
+        return
+
+    if not __are_valid_parameters(type, name, style, style_ext, react_ext):
+        return
+
+    __generate_template(type,name, style, style_ext, react_ext, barrel, test)  
+
+
+
+@click.command()
+@__common_generate_options
+def g(type: str, name: str, style: str, style_ext: str, react_ext: str, barrel: bool, test: bool):
+
+    genarate_handler(type, name, style, style_ext, react_ext, barrel, test)
+
+
+@click.command()
+@__common_generate_options
+def generate(type: str, name: str, style: str, style_ext: str, react_ext: str, barrel: bool, test: bool):
+
+    genarate_handler(type, name, style, style_ext, react_ext, barrel, test)

@@ -1,5 +1,5 @@
 import click
-from generate import generate,g
+from generate_command import generate,g
 
 @click.group()
 def cli():

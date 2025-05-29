@@ -19,7 +19,7 @@ def __create_folder_path(file_path: str):
 
 def __create_file(file_path: str, extension: str, template: str):
 
-    clean_template = textwrap.dedent(template).lstrip()
+    clean_template = textwrap.dedent(template).lstrip()  
 
     with open(f"{file_path}.{extension.replace('.', '')}", 'w') as file:
         file.write(clean_template)
@@ -48,6 +48,12 @@ def __get_path(file_path: str):
 def __uppercase_first(text:str):
     return text[0].upper() + text[1:]
 
+
+def __get_new_path(file_path: str, new_name: str):
+    path = f"{__get_path(file_path)}/{new_name}"
+    return path.lstrip('/')
+
+
 ##
 # public functions
 ##
@@ -75,7 +81,7 @@ def generate_component(file_path: str, extension: str, include_stylesheet: bool 
         );  
     }}
     """
-    path = f"{__get_path(file_path)}/{name}"
+    path = __get_new_path(file_path, name)
     
     __create_file(path, extension, template)
 
@@ -100,8 +106,8 @@ def generate_page(file_path: str, extension: str, include_stylesheet: bool = Fal
     }}
     """
 
-    path = f"{__get_path(file_path)}/{name}"
-
+    path = __get_new_path(file_path, name)
+    
     __create_file(path, extension, template)
 
 
@@ -127,7 +133,7 @@ def generate_service(file_path: str, use_typescript: bool = False, include_axios
 
     export default {full_name};
     """
-    path = f"{__get_path(file_path)}/{full_name}"
+    path = __get_new_path(file_path, full_name)
 
     __create_file(path, 'ts' if use_typescript else 'js', template)
 
@@ -152,7 +158,7 @@ def generate_router(file_path: str, extension: str):
         );
     }}
     """
-    path = f"{__get_path(file_path)}/{name}"
+    path = __get_new_path(file_path, name)
 
     __create_file(path, extension, template)
 
@@ -183,7 +189,7 @@ def generate_stylesheet(file_path: str, use_module: bool = False, use_scss: bool
 
     file_name = f"{component}{'.module' if use_module else ''}"
 
-    path = f"{__get_path(file_path)}/{file_name}"
+    path = __get_new_path(file_path, file_name)
 
     extension = f".{'scss' if use_scss else 'css'}"
 
@@ -205,7 +211,7 @@ def generate_hook(file_path: str, use_typescript: bool = False):
 
     export default {full_name};
     """
-    path = f"{__get_path(file_path)}/{full_name}"
+    path = __get_new_path(file_path, full_name)
 
     __create_file(path, 'ts' if use_typescript else 'js', template)
 
@@ -295,7 +301,7 @@ def generate_test(file_path:str, extension:str):
     
     name = __uppercase_first(__get_file_name(file_path))
 
-    path = f"{__get_path(file_path)}/{name}.test"
+    path = __get_new_path(file_path, f'{name}.test')
 
     __create_file(path, extension, '')
 
@@ -310,7 +316,7 @@ def generate_barrel_file(file_path:str, use_typescript:bool = False):
     export {{ default }} from './{component}';
     """
 
-    path = f"{__get_path(file_path)}/index"
+    path = __get_new_path(file_path, 'index')
 
     extension = f".{'ts' if use_typescript else 'js'}"
 

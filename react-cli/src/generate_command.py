@@ -55,10 +55,10 @@ def __are_valid_parameters(type: str, name: str, style: str, style_ext: str, rea
 
 def __create_component(name: str, react_ext: str, style_mode: str, style_ext: str, barrel: bool, test: bool, is_page:bool = False):
 
-    folders = name.split('/')
-    component = folders.pop()
-    folders.append(sc.__uppercase_first(component))
-    path = '/'.join(folders)
+    dirs = name.split('/')
+    component = dirs.pop()
+    dirs.append(sc.__uppercase_first(component))
+    path = '/'.join(dirs)
     dir_path = ut.format_path(path, True)
     path = sc.get_encapsulated_path(dir_path)
 
@@ -87,11 +87,16 @@ def __create_component(name: str, react_ext: str, style_mode: str, style_ext: st
         click.secho(f"Created: {dir_path}/index.{'ts' if use_typescript else 'js'}", fg='green')
 
 
-def __create_service():   
-    pass 
+def __create_service(name: str, react_ext: str, include_axios: bool ):   
+ 
+    use_typescript =  vl.detect_typescript() if  react_ext == 'auto' else (react_ext in ['tsx', 'ts'])
+    sc.generate_service(name, use_typescript, include_axios)
+    dirs = name.split('/')
+    service = dirs.pop()
+    click.secho(f"Created: {'/'.join(dirs)}/{service}Service.{'ts' if use_typescript else 'js'}", fg='green')
 
 
-def __generate_template(type: str, name: str, style_mode: str, style_ext: str, react_ext: str, barrel: bool, test: bool):
+def __generate_template(type: str, name: str, style_mode: str, style_ext: str, react_ext: str, barrel: bool, test: bool, axios: bool):
 
     if type == "component" or type == "c":
         __create_component(name, react_ext, style_mode, style_ext, barrel, test)
@@ -100,7 +105,7 @@ def __generate_template(type: str, name: str, style_mode: str, style_ext: str, r
        __create_component(name, react_ext, style_mode, style_ext, barrel, test, True)
 
     if type == "service" or type == "s":
-        pass    
+       __create_service(name, react_ext, axios)
 
     if type == "interface":
         pass
@@ -114,10 +119,11 @@ def __common_generate_options(func):
     func = click.option('--react-ext', default='auto', help='')(func)
     func = click.option('--barrel', '-b', is_flag=True, help='')(func)
     func = click.option('--test', '-t', is_flag=True, help='')(func)
+    func = click.option('--axios','-a', is_flag=True, help='')(func)
     return func
 
 
-def genarate_handler(type: str, name: str, style: str, style_ext: str, react_ext: str, barrel: bool, test: bool):
+def genarate_handler(type: str, name: str, style: str, style_ext: str, react_ext: str, barrel: bool, test: bool, axios: bool):
 
     if not __is_valid_environment():
         return
@@ -125,19 +131,19 @@ def genarate_handler(type: str, name: str, style: str, style_ext: str, react_ext
     if not __are_valid_parameters(type, name, style, style_ext, react_ext):
         return
 
-    __generate_template(type,name, style, style_ext, react_ext, barrel, test)  
+    __generate_template(type,name, style, style_ext, react_ext, barrel, test, axios)  
 
 
 
 @click.command()
 @__common_generate_options
-def g(type: str, name: str, style: str, style_ext: str, react_ext: str, barrel: bool, test: bool):
+def g(type: str, name: str, style: str, style_ext: str, react_ext: str, barrel: bool, test: bool, axios: bool):
 
-    genarate_handler(type, name, style, style_ext, react_ext, barrel, test)
+    genarate_handler(type, name, style, style_ext, react_ext, barrel, test, axios)
 
 
 @click.command()
 @__common_generate_options
-def generate(type: str, name: str, style: str, style_ext: str, react_ext: str, barrel: bool, test: bool):
+def generate(type: str, name: str, style: str, style_ext: str, react_ext: str, barrel: bool, test: bool, axios: bool):
 
-    genarate_handler(type, name, style, style_ext, react_ext, barrel, test)
+    genarate_handler(type, name, style, style_ext, react_ext, barrel, test, axios)

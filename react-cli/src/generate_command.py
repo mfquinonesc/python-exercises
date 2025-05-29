@@ -96,6 +96,19 @@ def __create_service(name: str, react_ext: str, include_axios: bool ):
     click.secho(f"Created: {'/'.join(dirs)}/{service}Service.{'ts' if use_typescript else 'js'}", fg='green')
 
 
+def __create_interface(name:str):
+    sc.generate_interface(name)
+    click.secho(f"Created: {name}.ts", fg='green')
+
+
+def __create_class(name:str, react_ext:str):
+    extension = ('ts' if vl.detect_typescript() else 'js') if react_ext == 'auto' else react_ext.replace('x','')
+    sc.generate_class(name)
+    click.secho(f"Created: {name}.{extension}", fg='green')
+
+
+
+
 def __generate_template(type: str, name: str, style_mode: str, style_ext: str, react_ext: str, barrel: bool, test: bool, axios: bool):
 
     if type == "component" or type == "c":
@@ -108,7 +121,12 @@ def __generate_template(type: str, name: str, style_mode: str, style_ext: str, r
        __create_service(name, react_ext, axios)
 
     if type == "interface":
-        pass
+        __create_interface(name)
+
+    if type == 'class':
+        __create_class(name, react_ext)
+
+   
 
 
 def __common_generate_options(func):
